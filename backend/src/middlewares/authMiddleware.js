@@ -15,13 +15,13 @@ const verifyToken = async (req, res, next) => {
         try {
             const decode = jwt.verify(token, process.env.JWT_SECRET);
 
-            // Fetch full user from DB
+            
             const user = await User.findById(decode.id).select("id role email");
             if (!user) {
                 return res.status(404).json({ message: "User not found" });
             }
 
-            req.user = user; // now has email, id
+            req.user = user; 
             console.log("Authenticated user:", req.user);
 
             next();

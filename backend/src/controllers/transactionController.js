@@ -3,7 +3,7 @@ const Transaction = require("../models/transactionModel");
 //add transaction
 const addTransactions = async (req, res) => {
     try {
-        const { title, amount, category } = req.body;
+        const { title, amount, category, createdAt } = req.body;
         if (!title || !amount || !category) {
             return res.status(400).json({ message: "Title,amount and category is required" });
         }
@@ -12,13 +12,14 @@ const addTransactions = async (req, res) => {
             title,
             amount,
             category,
-            user: req.user.id
+            user: req.user.id,
+            createdAt: createdAt ? new Date(createdAt) : undefined
         });
 
         await newTransaction.save();
         return res.status(201).json({ message: "New Transaction added successfully", newTransaction });
     } catch (error) {
-        console.error("Error in transaction controller: ", error.message); //to be removed in production
+        console.error("Error in transaction controller: ", error.message); 
         return res.status(500).json("Server Error");
     }
 }
@@ -34,7 +35,7 @@ const getTransaction = async (req, res) => {
 
         res.status(200).json({ transaction });
     } catch (error) {
-        console.error("Error in getTransaction controller: ", error);
+        console.error("Error in getTransaction controller: ", error); 
         return res.status(500).json({ message: "Internal Server Error" });
     }
 
@@ -49,7 +50,7 @@ const getAllTransactions = async (req, res) => {
         }
         return res.status(200).json(transactions);
     } catch (error) {
-        console.error("Error in getAllTransactions: ", error.message);
+        console.error("Error in getAllTransactions: ", error.message); 
         return res.status(500).json({ message: "Internal Server Error" });
     }
 }
@@ -61,30 +62,36 @@ const editTransaction = async (req, res) => {
             _id: req.params.id,
             user: req.user.id
         });
-        let updated = false;
 
         if (!transaction) {
             return res.status(404).json({ message: "Transaction not found" });
         }
 
-        const { title, amount, category } = req.body;
+        const { title, amount, category, createdAt } = req.body;
+        let updated = false;
 
-        if (title) { transaction.title = title; updated = true }
-        if (amount) { transaction.amount = amount; updated = true }
-        if (category) { transaction.category = category; updated = true }
+        if (title) { transaction.title = title; updated = true; }
+        if (amount) { transaction.amount = amount; updated = true; }
+        if (category) { transaction.category = category; updated = true; }
+        if (createdAt) { transaction.createdAt = new Date(createdAt); updated = true; } 
 
         if (!updated) {
             return res.status(400).json({ message: "No valid field to update" });
         }
 
         await transaction.save();
-        return res.status(200).json({ message: "Transaction updated successfully", transaction });
+
+        return res.status(200).json({
+            message: "Transaction updated successfully",
+            transaction
+        });
 
     } catch (error) {
         console.error("Error in editTransaction controller: ", error.message);
         return res.status(500).json({ message: "Internal Server Error" });
     }
-}
+};
+
 
 //delete transaction
 const deleteTransaction = async (req, res) => {
