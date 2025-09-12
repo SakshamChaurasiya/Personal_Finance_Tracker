@@ -1,22 +1,26 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import { LogIn, User, Lock, Wallet, ArrowRight } from "lucide-react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Login = () => {
-  const { user, login } = useContext(AuthContext);
+  const { login } = useContext(AuthContext);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (user) navigate("/"); 
-  }, [user]);
 
   const [form, setForm] = useState({ username: "", password: "" });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await login(form);
-    navigate("/");
+    const res = await login(form);
+
+    if (res.success) {
+      toast.success(res.message || "✅ Login successful! Redirecting...");
+      setTimeout(() => navigate("/"), 1500); 
+    } else {
+      toast.error(res.message || "❌ Invalid credentials. Please try again.");
+    }
   };
 
   return (
@@ -30,7 +34,9 @@ const Login = () => {
             </div>
           </div>
           <h1 className="text-3xl font-bold text-gray-900">Welcome Back</h1>
-          <p className="text-gray-600 mt-2">Sign in to your account to continue</p>
+          <p className="text-gray-600 mt-2">
+            Sign in to your account to continue
+          </p>
         </div>
 
         {/* Login Form */}
@@ -52,7 +58,9 @@ const Login = () => {
                   type="text"
                   placeholder="Enter your username"
                   value={form.username}
-                  onChange={(e) => setForm({ ...form, username: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, username: e.target.value })
+                  }
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder-gray-400"
                   required
                 />
@@ -70,7 +78,9 @@ const Login = () => {
                   type="password"
                   placeholder="Enter your password"
                   value={form.password}
-                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, password: e.target.value })
+                  }
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder-gray-400"
                   required
                 />
@@ -78,7 +88,7 @@ const Login = () => {
             </div>
 
             {/* Submit Button */}
-            <button 
+            <button
               type="submit"
               className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center justify-center space-x-2 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
@@ -90,9 +100,9 @@ const Login = () => {
           {/* Register Link */}
           <div className="mt-6 text-center">
             <p className="text-gray-600">
-              Don't have an account?{" "}
-              <Link 
-                to="/register" 
+              Don&apos;t have an account?{" "}
+              <Link
+                to="/register"
                 className="text-blue-600 hover:text-blue-700 font-semibold hover:underline transition-colors duration-200"
               >
                 Create one here
@@ -108,6 +118,9 @@ const Login = () => {
           </p>
         </div>
       </div>
+
+      {/* Toasts always mounted */}
+      <ToastContainer position="top-right" autoClose={2000} />
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React,{ createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect } from "react";
 import { loginUser, registerUser } from "../api/api";
 
 export const AuthContext = createContext();
@@ -13,17 +13,35 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (credentials) => {
-    const { data } = await loginUser(credentials);
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("user", JSON.stringify(data.user));
-    setUser(data.user);
+    try {
+      const { data } = await loginUser(credentials);
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      setUser(data.user);
+
+      return { success: true, message: "Login successful!" };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || "Invalid credentials",
+      };
+    }
   };
 
   const register = async (credentials) => {
-    const { data } = await registerUser(credentials);
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("user", JSON.stringify(data.user));
-    setUser(data.user);
+    try {
+      const { data } = await registerUser(credentials);
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      setUser(data.user);
+
+      return { success: true, message: "Registration successful!" };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || "Registration failed",
+      };
+    }
   };
 
   const logout = () => {

@@ -1,22 +1,34 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
-import { UserPlus, User, Mail, Lock, Wallet, ArrowRight, Shield } from "lucide-react";
+import {
+  UserPlus,
+  User,
+  Mail,
+  Lock,
+  Wallet,
+  ArrowRight,
+  Shield,
+} from "lucide-react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Register = () => {
-  const { user, register } = useContext(AuthContext);
+  const { register } = useContext(AuthContext);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (user) navigate("/"); 
-  }, [user]);
 
   const [form, setForm] = useState({ username: "", email: "", password: "" });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await register(form);
-    navigate("/");
+    const res = await register(form);
+
+    if (res.success) {
+      toast.success(res.message || "✅ Account created successfully!");
+      setTimeout(() => navigate("/"), 1500);
+    } else {
+      toast.error(res.message || "❌ Registration failed. Try again.");
+    }
   };
 
   return (
@@ -30,7 +42,9 @@ const Register = () => {
             </div>
           </div>
           <h1 className="text-3xl font-bold text-gray-900">Join FinanceTracker</h1>
-          <p className="text-gray-600 mt-2">Create your account and start managing your finances</p>
+          <p className="text-gray-600 mt-2">
+            Create your account and start managing your finances
+          </p>
         </div>
 
         {/* Register Form */}
@@ -134,6 +148,9 @@ const Register = () => {
           </p>
         </div>
       </div>
+
+      {/* Toasts always mounted */}
+      <ToastContainer position="top-right" autoClose={2000} />
     </div>
   );
 };

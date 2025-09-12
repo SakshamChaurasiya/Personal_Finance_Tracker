@@ -10,6 +10,9 @@ import Register from "./pages/RegisterPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./components/NotFound";
 
+import { ToastContainer, toast } from "react-toastify";
+
+
 function App() {
   return (
     <AuthProvider>
@@ -33,6 +36,16 @@ function App() {
 
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <ToastContainer
+            position="top-right"
+            autoClose={3000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            pauseOnHover
+            draggable
+            theme="colored"
+          />
         </BrowserRouter>
       </TransactionProvider>
     </AuthProvider>
